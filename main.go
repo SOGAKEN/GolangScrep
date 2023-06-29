@@ -4,11 +4,14 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 type Result struct {
@@ -19,7 +22,9 @@ type Result struct {
 
 func Scrape(keyword string) []Result {
 
-	googleURL := "http://www.google.com/search?q=" + keyword
+	urlstr := url.QueryEscape(keyword)
+
+	googleURL := "http://www.google.com/search?q=" + urlstr
 
 	client := &http.Client{}
 
@@ -29,7 +34,10 @@ func Scrape(keyword string) []Result {
 
 	resp, _ := client.Do(req)
 
-	document, _ := goquery.NewDocumentFromReader(resp.Body)
+	document, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	results := []Result{}
 
@@ -68,7 +76,7 @@ func main() {
 			}
 			defer csvfile.Close()
 
-			reader := csv.NewReader(csvfile)
+			reader := csv.NewReader(transform.NewReader(csvfile, japanese.ShiftJIS.NewDecoder()))
 			keywordLines, err := reader.ReadAll()
 			if err != nil {
 				fmt.Println(err)
