@@ -91,7 +91,8 @@ func main() {
 			}
 			defer outfile.Close()
 
-			writer := csv.NewWriter(outfile)
+			writer := csv.NewWriter(transform.NewWriter(outfile, japanese.ShiftJIS.NewEncoder()))
+
 			defer writer.Flush()
 
 			writer.Write([]string{"Keyword", "Title", "URL"})
@@ -102,6 +103,11 @@ func main() {
 
 				for _, result := range results {
 					writer.Write([]string{result.Keyword, result.Title, result.URL})
+					err = writer.Write([]string{result.Keyword, result.Title, result.URL})
+					if err != nil {
+						fmt.Println(err)
+					}
+
 				}
 			}
 		}
