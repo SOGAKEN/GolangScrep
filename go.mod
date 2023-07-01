@@ -1,4 +1,4 @@
-module golang-dcrep
+module GolangScrep
 
 go 1.20
 
