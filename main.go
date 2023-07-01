@@ -102,7 +102,6 @@ func main() {
 				results := Scrape(keyword)
 
 				for _, result := range results {
-					writer.Write([]string{result.Keyword, result.Title, result.URL})
 					err = writer.Write([]string{result.Keyword, result.Title, result.URL})
 					if err != nil {
 						fmt.Println(err)
